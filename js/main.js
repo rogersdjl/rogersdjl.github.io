@@ -10,26 +10,13 @@ let posts = [];
  */
 async function scanMarkdownFiles() {
     try {
-        // 获取posts目录列表
-        const response = await fetch('posts/');
+        // 从posts.json获取文章列表，而不是尝试扫描目录
+        const response = await fetch('posts.json');
         if (!response.ok) {
             throw new Error('无法获取文章列表');
         }
         
-        const html = await response.text();
-        
-        // 创建临时DOM元素来解析HTML
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        
-        // 获取所有链接
-        const links = Array.from(doc.querySelectorAll('a'));
-        
-        // 过滤出Markdown文件链接
-        const mdFiles = links
-            .map(link => link.getAttribute('href'))
-            .filter(href => href && href.endsWith('.md'))
-            .map(href => 'posts/' + href);
+        const mdFiles = await response.json();
         
         if (mdFiles.length > 0) {
             // 重新加载所有文章信息
